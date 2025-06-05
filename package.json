@@ -8,7 +8,10 @@
   "license": "MIT",
   "author": "Kelly Ripple",
   "type": "module",
-  "scripts": {},
+  "scripts": {
+    "test": "playwright test",
+    "posttest": "rm -rf temp"
+  },
   "dependencies": {},
   "devDependencies": {
     "@playwright/test": "^1.51.1",
