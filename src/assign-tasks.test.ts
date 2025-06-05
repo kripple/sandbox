@@ -25,7 +25,7 @@ test.describe('assignTasks', () => {
   test('assigns tasks', () => {
     const tasks = ['task'];
     const workers = ['worker'];
-    const actual = assignTasks({ tasks, workers });
+    const { taskAssignments: actual } = assignTasks({ tasks, workers });
     const expected = {
       worker: ['task'],
     };
@@ -33,7 +33,7 @@ test.describe('assignTasks', () => {
   });
 
   test('assigns all tasks', () => {
-    const actual = assignTasks(
+    const { taskAssignments: actual } = assignTasks(
       getProps({
         tasks: 3,
         workers: 2,
@@ -44,7 +44,7 @@ test.describe('assignTasks', () => {
   });
 
   test('assigns tasks to all workers', () => {
-    const actual = assignTasks(
+    const { taskAssignments: actual } = assignTasks(
       getProps({
         tasks: 7,
         workers: 5,

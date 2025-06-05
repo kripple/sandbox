@@ -14,18 +14,30 @@ export function assignTasks({
   workers: string[];
   tasks: string[];
 }) {
-  if (workers.length === 0) throw Error('No available workers.');
-  const taskAssignments = {} as { [worker: string]: string[] };
+  if (workers.length === 0 && tasks.length > 0)
+    throw Error('No available workers.');
 
+  const taskAssignments = {} as { [worker: string]: string[] };
+  let minTaskCount = 0;
   let workerIndex = 0;
-  tasks.map((task) => {
+
+  tasks.map((task, i) => {
     const worker = workers[workerIndex];
     if (!taskAssignments[worker]) taskAssignments[worker] = [];
     taskAssignments[worker].push(task);
+    if (i === tasks.length - 1) {
+      // save our place
+      const lastWorker =
+        workerIndex in workers ? workers[workerIndex] : undefined;
+      minTaskCount =
+        lastWorker && lastWorker in taskAssignments
+          ? taskAssignments[lastWorker].length
+          : 0;
+    }
     workerIndex = getNextIndex(workers.length, workerIndex);
   });
 
-  return taskAssignments;
+  return { taskAssignments, minTaskCount, workerIndex };
 }
 
 export function assignAllTasks({
@@ -48,33 +60,18 @@ export function assignAllTasks({
   if (specialists.length === 0 && specialTasks.length > 0)
     throw Error('No available specialists.');
 
-  const taskAssignments = {} as { [worker: string]: string[] };
-  let lastWorker: string | undefined;
-  let minTaskCount = 0;
-
-  let specialistIndex = 0;
-  for (let i = 0; i < specialTasks.length; i++) {
-    const task = specialTasks[i];
-    const worker = specialists[specialistIndex];
-    if (!taskAssignments[worker]) taskAssignments[worker] = [];
-    taskAssignments[worker].push(task);
-    if (i === specialTasks.length - 1) {
-      // save our place
-      lastWorker =
-        specialistIndex in specialists
-          ? specialists[specialistIndex]
-          : undefined;
-      minTaskCount =
-        lastWorker && lastWorker in taskAssignments
-          ? taskAssignments[lastWorker].length
-          : 0;
-    }
-    specialistIndex = getNextIndex(specialists.length, specialistIndex);
-  }
+  const {
+    taskAssignments,
+    minTaskCount,
+    workerIndex: initialSpecialistIndex,
+  } = assignTasks({
+    workers: specialists,
+    tasks: specialTasks,
+  });
+  let specialistIndex = initialSpecialistIndex;
 
   let workerIndex = 0;
-  for (let j = 0; j < tasks.length; j++) {
-    const task = tasks[j];
+  tasks.map((task) => {
     const worker = workers[workerIndex];
     if (!taskAssignments[worker]) taskAssignments[worker] = [];
 
@@ -91,7 +88,7 @@ export function assignAllTasks({
       taskAssignments[worker].push(task);
       workerIndex = getNextIndex(workers.length, workerIndex);
     }
-  }
+  });
 
   // console.debug(taskAssignments);
   return taskAssignments;
