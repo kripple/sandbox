@@ -66,25 +66,3 @@ export class List<T> {
       : this.index - 1;
   }
 }
-
-// push, pop, shift, unshift
-
-// list.add("Apple");           // Add to end
-// list.addFirst("Banana");     // Add to front
-// list.addLast("Cherry");      // Add to end (same as add)
-// list.add(1, "Date");         // Insert at index 1
-
-// String first = list.getFirst();  // "Banana"
-// String last = list.getLast();    // "Cherry"
-// String second = list.get(1);     // "Date"
-
-// list.set(2, "Avocado");  // Replace element at index 2
-
-// list.removeFirst();      // Removes "Banana"
-// list.removeLast();       // Removes "Cherry"
-// list.remove(1);          // Removes element at index 1 ("Avocado" after previous removes)
-// list.remove("Date");     // Removes first occurrence of "Date"
-
-// int size = list.size();
-// boolean hasApple = list.contains("Apple");
-// boolean isEmpty = list.isEmpty();

@@ -1,4 +1,4 @@
-import { List } from '@/utils/list';
+import { List } from '@/models/list';
 
 function _assignTasks({
   workers,
