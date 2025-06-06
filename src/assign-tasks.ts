@@ -1,13 +1,24 @@
-import { List } from '@/utils/linked-list';
+import { List } from '@/utils/list';
 
-// loop back to the beginning of the array
-const getNextIndex = (arrayLength: number, currentIndex: number) => {
-  if (currentIndex === arrayLength - 1) {
-    return 0;
-  } else {
-    return currentIndex + 1;
-  }
-};
+function _assignTasks({
+  workers,
+  tasks,
+}: {
+  workers: List<string>;
+  tasks: string[];
+}) {
+  const taskAssignments = {} as { [worker: string]: string[] };
+  if (tasks.length === 0) return taskAssignments;
+
+  tasks.map((task) => {
+    const worker = workers.next(); // mutates workersList (advances the index value)
+    if (!worker) return;
+    if (!taskAssignments[worker]) taskAssignments[worker] = [];
+    taskAssignments[worker].push(task);
+  });
+
+  return taskAssignments;
+}
 
 export function assignTasks({
   workers,
@@ -16,86 +27,62 @@ export function assignTasks({
   workers: string[];
   tasks: string[];
 }) {
-  const taskAssignments = {} as { [worker: string]: string[] };
-  if (tasks.length === 0) return taskAssignments;
-
   const workersList = new List(workers);
-  if (workersList.isEmpty()) throw Error('missing workers');
+  if (tasks.length === 0 && workersList.isEmpty())
+    throw Error('missing workers');
+  return _assignTasks({ workers: workersList, tasks });
+}
 
-  // let minTaskCount = 0;
-  // let workerIndex = 0;
+export function assignAllTasks({
+  workers,
+  specialists,
+  tasks,
+  specialTasks,
+}: {
+  workers: string[];
+  specialists: string[];
+  tasks: string[];
+  specialTasks: string[];
+}) {
+  const workersList = new List(workers);
+  const specialistsList = new List(specialists);
 
-  tasks.map((task, i) => {
-    const worker = workersList.getNext();
-    // const worker = workers[workerIndex];
+  if (
+    workersList.isEmpty() &&
+    specialistsList.isEmpty() &&
+    (tasks.length > 0 || specialTasks.length > 0)
+  )
+    throw Error('missing workers');
+
+  if (specialistsList.isEmpty() && specialTasks.length > 0)
+    throw Error('missing specialists');
+
+  const taskAssignments = _assignTasks({
+    workers: specialistsList,
+    tasks: specialTasks,
+  });
+
+  tasks.map((task) => {
+    const worker = workersList.nextValue();
+    const lastSpecialist = specialistsList.previousValue();
+
+    if (!worker) return;
     if (!taskAssignments[worker]) taskAssignments[worker] = [];
-    taskAssignments[worker].push(task);
+    if (lastSpecialist !== undefined && !taskAssignments[lastSpecialist])
+      taskAssignments[lastSpecialist] = [];
 
-    // if (i === tasks.length - 1) {
-    //   // save our place
-    //   const lastWorker =
-    //     workerIndex in workers ? workers[workerIndex] : undefined;
-    //   minTaskCount =
-    //     lastWorker && lastWorker in taskAssignments
-    //       ? taskAssignments[lastWorker].length
-    //       : 0;
-    // }
-    // workerIndex = getNextIndex(workers.length, workerIndex);
+    const assignToSpecialist =
+      !specialistsList.isEmpty() &&
+      lastSpecialist !== undefined &&
+      taskAssignments[worker].length > taskAssignments[lastSpecialist].length;
+
+    const selectedWorker = assignToSpecialist
+      ? specialistsList.next()
+      : workersList.next();
+    if (!selectedWorker) return;
+    if (!taskAssignments[selectedWorker]) taskAssignments[selectedWorker] = [];
+    taskAssignments[selectedWorker].push(task);
   });
 
   return taskAssignments;
 }
-
-// export function assignAllTasks({
-//   workers,
-//   specialists,
-//   tasks,
-//   specialTasks,
-// }: {
-//   workers: string[];
-//   specialists: string[];
-//   tasks: string[];
-//   specialTasks: string[];
-// }) {
-//   if (
-//     workers.length === 0 &&
-//     specialists.length === 0 &&
-//     (tasks.length > 0 || specialTasks.length > 0)
-//   )
-//     throw Error('No available workers.');
-//   if (specialists.length === 0 && specialTasks.length > 0)
-//     throw Error('No available specialists.');
-
-//   const {
-//     taskAssignments,
-//     minTaskCount,
-//     workerIndex: initialSpecialistIndex,
-//   } = assignTasks({
-//     workers: specialists,
-//     tasks: specialTasks,
-//   });
-//   let specialistIndex = initialSpecialistIndex;
-
-//   let workerIndex = 0;
-//   tasks.map((task) => {
-//     const worker = workers[workerIndex];
-//     if (!taskAssignments[worker]) taskAssignments[worker] = [];
-
-//     // assign regular tasks to specialists
-//     if (
-//       specialists.length > 0 &&
-//       taskAssignments[worker].length > minTaskCount
-//     ) {
-//       const worker = specialists[specialistIndex];
-//       if (!taskAssignments[worker]) taskAssignments[worker] = [];
-//       taskAssignments[worker].push(task);
-//       specialistIndex = getNextIndex(specialists.length, specialistIndex);
-//     } else {
-//       taskAssignments[worker].push(task);
-//       workerIndex = getNextIndex(workers.length, workerIndex);
-//     }
-//   });
-
-//   // console.debug(taskAssignments);
-//   return taskAssignments;
-// }
