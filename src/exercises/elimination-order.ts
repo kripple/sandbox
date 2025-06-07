@@ -1,7 +1,4 @@
-// `${driver} ${time}`
-// slowest time (total time, not lap time) is eliminated every lap
-
-// ties are both eliminated?
+import { sortByAlphabet } from '@/utils/array-sort';
 
 type DriverTime = {
   driver: string;
@@ -31,15 +28,23 @@ export function getEliminationOrder(laps: string[][]) {
     });
 
     // eliminate slowest driver
-    let lastPlace: DriverTime | undefined;
+    const lastPlace = { time: 0, drivers: [] } as {
+      time: number;
+      drivers: string[];
+    };
     Object.entries(driverTimesCumulative).map(([driver, time]) => {
       if (!eliminationOrder.includes(driver)) {
-        if (!lastPlace || lastPlace.time < time) {
-          lastPlace = { driver, time };
+        if (lastPlace.time < time) {
+          lastPlace.time = time;
+          lastPlace.drivers = [driver];
+        } else if (lastPlace.time === time) {
+          lastPlace.drivers.push(driver);
         }
       }
     });
-    if (lastPlace !== undefined) eliminationOrder.push(lastPlace.driver);
+
+    if (lastPlace.drivers.length > 0)
+      eliminationOrder.push(...sortByAlphabet(lastPlace.drivers));
   });
 
   return eliminationOrder;

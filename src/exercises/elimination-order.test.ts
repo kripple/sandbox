@@ -24,4 +24,14 @@ test.describe('getEliminationOrder', () => {
     const expected = ['driver-4', 'driver-3', 'driver-1', 'driver-2'];
     expect(actual).toEqual(expected);
   });
+
+  test('ties are both eliminated and sorted alphabetically', () => {
+    const laps = [
+      ['driver-3 30', 'driver-2 10', 'driver-1 20'],
+      ['driver-2 40', 'driver-3 30', 'driver-1 30'],
+    ];
+    const actual = getEliminationOrder(laps);
+    const expected = ['driver-3', 'driver-1', 'driver-2'];
+    expect(actual).toEqual(expected);
+  });
 });
