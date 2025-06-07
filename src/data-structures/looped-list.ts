@@ -11,11 +11,9 @@ export class LoopedList<T> {
 
   setBookmark() {
     this.bookmark = this.index;
-    // console.log(this.bookmark);
   }
 
   getBookmark() {
-    // console.log(this.bookmark);
     return this.bookmark === undefined ? undefined : this.list[this.bookmark];
   }
 
