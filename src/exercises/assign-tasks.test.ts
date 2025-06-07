@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { assignAllTasks, assignTasks } from './assign-tasks';
+import { assignAllTasks, assignTasks } from '@/exercises/assign-tasks';
 
 const fill = (label: string, count: number) =>
   new Array(count).fill(0).map((_, i) => `${label}-${i + 1}`);
