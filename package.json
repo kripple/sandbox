@@ -10,7 +10,8 @@
   "type": "module",
   "scripts": {
     "test": "playwright test",
-    "posttest": "rm -rf temp"
+    "posttest": "rm -rf temp",
+    "lint": "eslint . && prettier --check ."
   },
   "dependencies": {},
   "devDependencies": {
