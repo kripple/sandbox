@@ -1,3 +1,5 @@
+import readline from 'readline';
+
 // A todo list is an unordered list of items where each item has a string
 // id and a string value.
 type Todo = {
@@ -5,6 +7,11 @@ type Todo = {
   value: string;
 };
 let todos: Todo[] = [];
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
 
 // Modify Todo:
 //     m <id> - <todo value>
@@ -18,7 +25,6 @@ export function createOrModify(input?: string) {
   if (!currentTodo) {
     todos.push({ id, value });
   } else {
-    console.log('modify!');
     todos = todos.map((todo) => {
       if (todo.id === id) {
         return {
@@ -67,23 +73,39 @@ export function deleteTodo(id?: string) {
 // Quit:
 //     q
 //     Quits the program
-export function quitTheProgram() {}
+export function quitTheProgram() {
+  rl.close();
+  console.log('\nExited Successfully!\n');
+}
+
+const commands = {
+  m: { action: createOrModify, label: 'modify/create todo' },
+  p: { action: printTodo, label: 'print todo(s)' },
+  d: { action: deleteTodo, label: 'delete todo' },
+  q: { action: quitTheProgram, label: 'quit' },
+} as const;
+
+function listenForNextCommand() {
+  rl.question('\nPlease enter a command:\n> ', (input) => {
+    if (input.length < 1) {
+      console.warn(`invalid input '${input}'`);
+    }
+    const command = input[0];
+    const unsupportedCommand = !(command in commands);
+
+    if (command === 'q' || unsupportedCommand) {
+      if (unsupportedCommand) console.warn(`unsupported command '${command}'`);
+      quitTheProgram();
+    } else {
+      const props = input.length > 2 ? input.substring(2) : undefined;
+      commands[command as keyof typeof commands].action(props);
+      listenForNextCommand();
+    }
+  });
+}
 
 // Create a console application that allows the user to manage a todo list.
 // A todo list is an unordered list of items where each item has a string
 // id and a string value. For purposes of this exercise the todo list does not
 // need to be persisted after program exit.
-export function commandHandler(command: string, input?: string) {
-  const commands = {
-    m: { action: createOrModify, label: 'modify/create todo' },
-    p: { action: printTodo, label: 'print todo(s)' },
-    d: { action: deleteTodo, label: 'delete todo' },
-    q: { action: quitTheProgram, label: 'quit' },
-  } as const;
-
-  if (command in commands) {
-    commands[command as keyof typeof commands].action(input);
-  } else {
-    console.warn(`unsupported command '${command}'`);
-  }
-}
+listenForNextCommand();
