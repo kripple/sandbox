@@ -25,27 +25,24 @@ test.describe('console-app', () => {
   test('create todo', () => {
     createOrModify('foo - wash the dishes');
     const todos = createOrModify('baz - write more todos');
-    expect(todos).toEqual([
-      { id: 'foo', value: 'wash the dishes' },
-      { id: 'baz', value: 'write more todos' },
-    ]);
+    expect(todos).toEqual({ foo: 'wash the dishes', baz: 'write more todos' });
   });
 
   test('modify todo', () => {
     createOrModify('foo - wash the dishes');
     createOrModify('baz - write more todos');
     const todos = createOrModify('foo - wash the dishes again');
-    expect(todos).toEqual([
-      { id: 'foo', value: 'wash the dishes again' },
-      { id: 'baz', value: 'write more todos' },
-    ]);
+    expect(todos).toEqual({
+      foo: 'wash the dishes again',
+      baz: 'write more todos',
+    });
   });
 
   test('delete todo', () => {
     createOrModify('foo - wash the dishes');
     createOrModify('baz - write more todos');
     const todos = deleteTodo('baz');
-    expect(todos).toEqual([{ id: 'foo', value: 'wash the dishes' }]);
+    expect(todos).toEqual({ foo: 'wash the dishes' });
   });
 
   test.skip('console app responds correctly to command sequence', async () => {});

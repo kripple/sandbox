@@ -2,11 +2,10 @@ import readline from 'readline';
 
 // A todo list is an unordered list of items where each item has a string
 // id and a string value.
-type Todo = {
-  id: string;
-  value: string;
+type Todos = {
+  [id: string]: string;
 };
-let todos: Todo[] = [];
+const todos: Todos = {};
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -21,20 +20,7 @@ const rl = readline.createInterface({
 export function createOrModify(input?: string) {
   if (input === undefined) return todos; // fail silently
   const [id, value] = input.split(' - ');
-  const currentTodo = todos.filter((t) => t.id === id)?.[0];
-  if (!currentTodo) {
-    todos.push({ id, value });
-  } else {
-    todos = todos.map((todo) => {
-      if (todo.id === id) {
-        return {
-          id,
-          value,
-        };
-      }
-      return todo;
-    });
-  }
+  todos[id] = value;
   return todos;
 }
 
@@ -46,18 +32,17 @@ export function createOrModify(input?: string) {
 export function printTodo(id: string): void;
 export function printTodo(): void;
 export function printTodo(id?: string | undefined): void {
-  const format = (todo: Todo) => `${todo.id} - ${todo.value}`;
-  if (id) {
-    const currentTodo = todos.filter((t) => t.id === id)?.[0];
-    if (currentTodo) {
-      console.log(format(currentTodo));
-    } else {
-      console.log(`no todo for id '${id}'`);
-    }
-  } else {
-    todos.forEach((t) => {
-      console.log(format(t));
+  const format = ([id, value]: [id: string, value: string]) =>
+    `${id} - ${value}`;
+
+  if (id === undefined) {
+    Object.entries(todos).forEach((todo) => {
+      console.log(format(todo));
     });
+  } else if (id in todos) {
+    console.log(format([id, todos[id]]));
+  } else {
+    console.log(`no todo for id '${id}'`);
   }
 }
 
@@ -65,8 +50,7 @@ export function printTodo(id?: string | undefined): void {
 //     d <id>
 //     Deletes the item
 export function deleteTodo(id?: string) {
-  if (id === undefined) return; // fail silently
-  todos = todos.filter((todo) => todo.id !== id);
+  id !== undefined && delete todos[id];
   return todos;
 }
 
