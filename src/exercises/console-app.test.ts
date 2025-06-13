@@ -1,48 +1,25 @@
 import { expect, test } from '@playwright/test';
 
-import {
-  commandHandler,
-  createOrModify,
-  deleteTodo,
-  printTodo,
-} from '@/exercises/console-app';
+import { createOrModify, deleteTodo } from '@/exercises/console-app';
 
-// ========================================================================
+// const inputSequence = [
+//   { input: 'm foo - wash the dishes' },
+//   { input: 'p foo', output: ['foo - wash the dishes'] },
+//   { input: 'm foo - wash the dishes with hot water' },
 
-// EXAMPLES:
-
-//     Please enter a command:
-//     > m foo - wash the dishes
-
-//     Please enter a command:
-//     > p foo
-//     foo - wash the dishes
-
-//     Please enter a command:
-//     > m foo - wash the dishes with hot water
-
-//     Please enter a command:
-//     > p foo
-//     foo - wash the dishes with hot water
-
-//     Please enter a command:
-//     > m bar - do the laundry
-
-//     Please enter a command:
-//     > p
-//     foo - wash the dishes with hot water
-//     bar - do the laundry
-
-//     Please enter a command:
-//     > d foo
-
-//     Please enter a command:
-//     > p
-//     bar - do the laundry
-
-//     Please enter a command:
-//     > q
-//     Exited Successfully!
+//   { input: 'p foo', output: ['foo - wash the dishes with hot water'] },
+//   { input: 'm bar - do the laundry' },
+//   {
+//     input: 'p',
+//     output: ['foo - wash the dishes with hot water', 'bar - do the laundry'],
+//   },
+//   { input: 'd foo' },
+//   {
+//     input: 'p',
+//     output: ['bar - do the laundry'],
+//   },
+//   { input: 'q', output: ['Exited Successfully!'] },
+// ];
 
 test.describe('console-app', () => {
   test('create todo', () => {
@@ -70,4 +47,6 @@ test.describe('console-app', () => {
     const todos = deleteTodo('baz');
     expect(todos).toEqual([{ id: 'foo', value: 'wash the dishes' }]);
   });
+
+  test.skip('console app responds correctly to command sequence', async () => {});
 });
